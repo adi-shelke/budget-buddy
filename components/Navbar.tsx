@@ -1,5 +1,5 @@
 import React from "react";
-import Logo from "./Logo";
+import { Logo } from "./Logo";
 import { navbarItems } from "@/lib/constants";
 import NavbarItem from "./NavbarItem";
 import { UserButton } from "@clerk/nextjs";

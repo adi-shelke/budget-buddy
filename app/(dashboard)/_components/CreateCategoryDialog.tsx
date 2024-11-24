@@ -32,23 +32,68 @@ import {
   CreateCategorySchemaType,
 } from "@/schema/categories";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CircleOff, PlusSquare } from "lucide-react";
-import { useState } from "react";
+import { CircleOff, Loader2, PlusSquare } from "lucide-react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CreateCategory } from "../_actions/categories";
+import { Category } from "@prisma/client";
+import { toast } from "sonner";
 
 interface Props {
   type: TransactionType;
 }
 const CreateCategoryDialog = ({ type }: Props) => {
   const [open, setopen] = useState(false);
+  const [iconOpenState, seticonOpenState] = useState(false)
   const form = useForm<CreateCategorySchemaType>({
     resolver: zodResolver(CreateCategorySchema),
     defaultValues: {
+      name: "",
+      icon: "",
       type,
     },
   });
+
+  const queryClient = useQueryClient();
+  // create category mutation
+  const { mutate, isPending } = useMutation({
+    mutationFn: CreateCategory,
+    onSuccess: async (data: Category) => {
+      form.reset({
+        name: "",
+        icon: "",
+        type,
+      });
+      toast.success(`Category ${data.name} created successfully 🎉`, {
+        id: "create-category",
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["categories"],
+      });
+
+      setopen((prev) => !prev);
+    },
+    onError: () => {
+      toast.error("Something went wrong", {
+        id: "create-category",
+      });
+    },
+  });
+
+  const onSubmit = useCallback(
+    (values: CreateCategorySchemaType) => {
+      toast.loading("Creating category...", {
+        id: "create-category",
+      });
+      mutate(values);
+    },
+    [mutate]
+  );
+
   return (
     <Dialog open={open} onOpenChange={setopen}>
       <DialogTrigger asChild>
@@ -79,7 +124,7 @@ const CreateCategoryDialog = ({ type }: Props) => {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-8">
+          <form className="space-y-8 " onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               control={form.control}
               name="name"
@@ -87,7 +132,7 @@ const CreateCategoryDialog = ({ type }: Props) => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input defaultValue={""} {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormDescription>
                     Enter the name of the category
@@ -102,7 +147,7 @@ const CreateCategoryDialog = ({ type }: Props) => {
                 <FormItem>
                   <FormLabel>Icon</FormLabel>
                   <FormControl>
-                    <Popover>
+                    {/* <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant={"outline"}
@@ -127,15 +172,56 @@ const CreateCategoryDialog = ({ type }: Props) => {
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-full">
+                      <PopoverContent className=" w-full mt-10">
                         <Picker
+                          navPosition="bottom"
                           data={data}
                           onEmojiSelect={(emoji: { native: string }) => {
                             field.onChange(emoji.native);
                           }}
                         />
                       </PopoverContent>
-                    </Popover>
+                    </Popover> */}
+                    <Dialog open={iconOpenState} onOpenChange={seticonOpenState}>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className="h-[100px] w-full"
+                        >
+                          {form.watch("icon") ? (
+                            <div className="flex flex-col items-center gap-2">
+                              <p className="text-5xl" role="img">
+                                {field.value}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Click to change
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-2">
+                              <CircleOff className="!h-[48px] !w-[48px]" />
+                              <p className="text-xs text-muted-foreground">
+                                Click to select
+                              </p>
+                            </div>
+                          )}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="w-[400px]">
+                        <DialogHeader>
+                          <DialogTitle>Select an icon</DialogTitle>
+                        </DialogHeader>
+                        <Picker
+                       
+                          navPosition="bottom"
+                          data={data}
+                          onEmojiSelect={(emoji: { native: string }) => {
+                            field.onChange(emoji.native);
+                            seticonOpenState(false)
+                          }}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   </FormControl>
                   <FormDescription>
                     This icon will help identify your category at a glance
@@ -157,7 +243,9 @@ const CreateCategoryDialog = ({ type }: Props) => {
               Cancel
             </Button>
           </DialogClose>
-          <Button>Save</Button>
+          <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
+            {!isPending ? "Create" : <Loader2 className="animate-spin" />}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

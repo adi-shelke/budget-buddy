@@ -31,7 +31,7 @@ const CategoryPicker = ({ type }: Props) => {
           variant={"outline"}
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between "
+          className="w-[200px] justify-between mx-3"
         >
           {validatedSelectedCategory ? (
             <CategoryRow category={validatedSelectedCategory} />

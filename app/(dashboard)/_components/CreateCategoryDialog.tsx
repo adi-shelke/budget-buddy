@@ -41,13 +41,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateCategory } from "../_actions/categories";
 import { Category } from "@prisma/client";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 
 interface Props {
   type: TransactionType;
+  successCallback: (category: Category) => void;
 }
-const CreateCategoryDialog = ({ type }: Props) => {
+const CreateCategoryDialog = ({ type, successCallback }: Props) => {
   const [open, setopen] = useState(false);
-  const [iconOpenState, seticonOpenState] = useState(false)
+  const [iconOpenState, seticonOpenState] = useState(false);
   const form = useForm<CreateCategorySchemaType>({
     resolver: zodResolver(CreateCategorySchema),
     defaultValues: {
@@ -58,6 +60,9 @@ const CreateCategoryDialog = ({ type }: Props) => {
   });
 
   const queryClient = useQueryClient();
+
+  const theme = useTheme();
+
   // create category mutation
   const { mutate, isPending } = useMutation({
     mutationFn: CreateCategory,
@@ -70,6 +75,8 @@ const CreateCategoryDialog = ({ type }: Props) => {
       toast.success(`Category ${data.name} created successfully 🎉`, {
         id: "create-category",
       });
+
+      successCallback(data);
 
       await queryClient.invalidateQueries({
         queryKey: ["categories"],
@@ -132,10 +139,11 @@ const CreateCategoryDialog = ({ type }: Props) => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input placeholder="Category" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Enter the name of the category
+                    This name will help identify the category in your
+                    transaction list
                   </FormDescription>
                 </FormItem>
               )}
@@ -182,7 +190,10 @@ const CreateCategoryDialog = ({ type }: Props) => {
                         />
                       </PopoverContent>
                     </Popover> */}
-                    <Dialog open={iconOpenState} onOpenChange={seticonOpenState}>
+                    <Dialog
+                      open={iconOpenState}
+                      onOpenChange={seticonOpenState}
+                    >
                       <DialogTrigger asChild>
                         <Button
                           variant={"outline"}
@@ -212,12 +223,12 @@ const CreateCategoryDialog = ({ type }: Props) => {
                           <DialogTitle>Select an icon</DialogTitle>
                         </DialogHeader>
                         <Picker
-                       
+                          theme={theme.resolvedTheme}
                           navPosition="bottom"
                           data={data}
                           onEmojiSelect={(emoji: { native: string }) => {
                             field.onChange(emoji.native);
-                            seticonOpenState(false)
+                            seticonOpenState(false);
                           }}
                         />
                       </DialogContent>

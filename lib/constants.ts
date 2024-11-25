@@ -12,4 +12,6 @@ export const currencies = [
   { value: "GBP", label: "£ Pound", locale: "en-GB" },
 ];
 
-export type Currency  = (typeof currencies)[0]
+export type Currency = (typeof currencies)[0];
+
+export const MAX_DATE_RANGE_DAYS = 90;

@@ -371,7 +371,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
           </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align={align} className="w-auto">
+      <PopoverContent align={align} className="w-auto pt-0">
         <div className="flex py-2">
           <div className="flex">
             <div className="flex flex-col">
@@ -486,27 +486,29 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
                   )}
                 </div>
               </div>
-              {isSmallScreen && (
-                <Select
-                  defaultValue={selectedPreset}
-                  onValueChange={(value) => {
-                    setPreset(value);
-                  }}
-                >
-                  <SelectTrigger className="w-[180px] mx-auto mb-2">
-                    <SelectValue placeholder="Select..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PRESETS.map((preset) => (
-                      <SelectItem key={preset.name} value={preset.name}>
-                        {preset.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
+              {/* {isSmallScreen && ( */}
+              <Select
+                defaultValue={selectedPreset}
+                onValueChange={(value) => {
+                  setPreset(value);
+                }}
+              >
+                <SelectTrigger className="w-[180px] mx-auto mb-2">
+                  <SelectValue placeholder="Select..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRESETS.map((preset) => (
+                    <SelectItem key={preset.name} value={preset.name}>
+                      {preset.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {/* )} */}
               <div>
                 <Calendar
+                 
+                  className="-mt-2"
                   mode="range"
                   onSelect={(value: { from?: Date; to?: Date } | undefined) => {
                     if (value?.from != null) {
@@ -517,19 +519,15 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
                     today: "bg-blue-500 text-white", // Custom styles for today
                   }}
                   selected={range}
-                  numberOfMonths={isSmallScreen ? 1 : 2}
+                  numberOfMonths={1}
                   defaultMonth={
-                    new Date(
-                      new Date().setMonth(
-                        new Date().getMonth() - (isSmallScreen ? 0 : 1)
-                      )
-                    )
+                    new Date(new Date().setMonth(new Date().getMonth() - 0))
                   }
                 />
               </div>
             </div>
           </div>
-          {!isSmallScreen && (
+          {/* {!isSmallScreen && (
             <div className="flex flex-col items-end gap-1 pr-2 pl-6 pb-6">
               <div className="flex w-full flex-col items-end gap-1 pr-2 pl-6 pb-6">
                 {PRESETS.map((preset) => (
@@ -542,10 +540,11 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
         <div className="flex justify-end gap-2 py-2 pr-4">
           <Button
+            className="-mt-5"
             onClick={() => {
               setIsOpen(false);
               resetValues();
@@ -555,6 +554,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
             Cancel
           </Button>
           <Button
+            className="-mt-5"
             onClick={() => {
               setIsOpen(false);
               if (

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { DateToUTCDate, GetFormatterForCurrency } from "@/lib/helpers";
 import { UserSettings } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
-import { TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
 import React, { useCallback, useMemo } from "react";
 import CountUp from "react-countup";
 interface Props {
@@ -32,12 +32,32 @@ const StatsCards = ({ from, to, userSettings }: Props) => {
   const balance = income - expense;
 
   return (
-    <div className="relative flex w-full flex-wrap gap-2 md:flex-nowrap ">
+    <div className=" container relative flex w-full flex-wrap gap-2 md:flex-nowrap ">
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
         <StatCard
           formatter={formatter}
           value={income}
           title="Income"
+          icon={
+            <TrendingUp className="h-12 w-12 items-center rounded-lg p-2 text-emerald-500 bg-emerald-400/10" />
+          }
+        />
+      </SkeletonWrapper>
+      <SkeletonWrapper isLoading={statsQuery.isFetching}>
+        <StatCard
+          formatter={formatter}
+          value={expense}
+          title="Expense"
+          icon={
+            <TrendingDown className="h-12 w-12 items-center rounded-lg p-2 text-red-500 bg-red-400/10" />
+          }
+        />
+      </SkeletonWrapper>
+      <SkeletonWrapper isLoading={statsQuery.isFetching}>
+        <StatCard
+          formatter={formatter}
+          value={balance}
+          title="Balance"
           icon={
             <TrendingUp className="h-12 w-12 items-center rounded-lg p-2 text-emerald-500 bg-emerald-400/10" />
           }

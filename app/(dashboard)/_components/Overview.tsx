@@ -24,7 +24,6 @@ const Overview = ({ userSettings }: { userSettings: UserSettings }) => {
             showCompare={false}
             onUpdate={(values) => {
               const { from, to } = values.range;
-
               //update the date range only if both dates are set
 
               if (!from || !to) return;

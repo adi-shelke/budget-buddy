@@ -7,7 +7,6 @@ import { buttonVariants } from './ui/button';
 
 const NavbarItem = ({ label, link, clickCallback }: { label: string; link: string, clickCallback?:()=>void }) => {
     const pathname = usePathname()
-    console.log(pathname)
     const isActive = pathname === link
     return <div className="relative flex items-center">
         <Link className={cn(buttonVariants({variant:"ghost"}), "w-full justify-start text-lg text-muted-foreground hover:text-foreground ", isActive&& "text-foreground")} href={link}

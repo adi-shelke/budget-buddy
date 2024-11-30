@@ -7,6 +7,7 @@ import { differenceInDays, startOfMonth } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
 import StatsCards from "./StatsCards";
+import CategoriesStats from "./CategoriesStats";
 
 const Overview = ({ userSettings }: { userSettings: UserSettings }) => {
   const [dateRange, setdateRange] = useState<{ from: Date; to: Date }>({
@@ -38,7 +39,19 @@ const Overview = ({ userSettings }: { userSettings: UserSettings }) => {
           />
         </div>
       </div>
-      <StatsCards  userSettings={userSettings} from={dateRange.from} to={dateRange.to} />
+      <div className="container flex flex-col w-full gap-2">
+        <StatsCards
+          userSettings={userSettings}
+          from={dateRange.from}
+          to={dateRange.to}
+        />
+
+        <CategoriesStats
+          userSettings={userSettings}
+          from={dateRange.from}
+          to={dateRange.to}
+        />
+      </div>
     </>
   );
 };

@@ -23,6 +23,7 @@ const CategoriesStats = ({ from, to, userSettings }: Props) => {
           to
         )}`
       ).then((res) => res.json()),
+      refetchOnWindowFocus: false,
   });
 
   const formatter = useMemo(() => {
@@ -74,7 +75,7 @@ function CategoriesCard({
       </CardHeader>
       <div className="flex items-center justify-between gap-2">
         {filteredData.length === 0 && (
-          <div className="flex h-60 w-full flex-col items-center justify-center">
+          <div className="flex h-60 w-full flex-col items-center justify-center container">
             No data for selected period ☹️
             <p className="text-sm text-muted-foreground">
               Try selecting a different period or try adding new{" "}

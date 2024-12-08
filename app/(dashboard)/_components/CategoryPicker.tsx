@@ -40,6 +40,7 @@ const CategoryPicker = ({ type, onChange }: Props) => {
     queryKey: ["categories", type],
     queryFn: () =>
       fetch(`/api/categories?type=${type}`).then((res) => res.json()),
+    refetchOnWindowFocus: false,
   });
 
   const validatedSelectedCategory = categoriesQuery.data?.find(

@@ -35,16 +35,16 @@ import { toast } from "sonner";
 export function CurrencyComboBox() {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [selectedCurrency, setSelectedCurrency] = React.useState<Currency | null>(
-    null
-  );
+  const [selectedCurrency, setSelectedCurrency] =
+    React.useState<Currency | null>(null);
 
   // for fetching user settings
   const userSettings = useQuery<UserSettings>({
     queryKey: ["userSettings"],
     queryFn: () => fetch("/api/user-settings").then((res) => res.json()),
+    refetchOnWindowFocus: false,
   });
- 
+
   //setting the user currency
   useEffect(() => {
     if (!userSettings.data) return;
@@ -54,51 +54,56 @@ export function CurrencyComboBox() {
     if (userCurrency) setSelectedCurrency(userCurrency);
   }, [userSettings.data]);
 
+  // Using React Query's useMutation hook to handle the currency update operation
+  const mutation = useMutation({
+    // Function to call when the mutation is triggered
+    mutationFn: updateUserCurrency,
 
- // Using React Query's useMutation hook to handle the currency update operation
-const mutation = useMutation({
-  // Function to call when the mutation is triggered
-  mutationFn: updateUserCurrency,
+    // Callback executed on a successful mutation
+    onSuccess: (data: UserSettings) => {
+      // Show a success toast notification
+      toast.success("Currency updated successfully 🎉", {
+        id: "update-currency",
+      });
+      // Update the selected currency in the state based on the server response
+      setSelectedCurrency(
+        currencies.find((currency) => currency.value === data.currency) || null
+      );
+    },
 
-  // Callback executed on a successful mutation
-  onSuccess: (data: UserSettings) => {
-    // Show a success toast notification
-    toast.success("Currency updated successfully 🎉", {
-      id: "update-currency",
-    });
-    // Update the selected currency in the state based on the server response
-    setSelectedCurrency(
-      currencies.find((currency) => currency.value === data.currency) || null
-    );
-  },
+    // Callback executed when the mutation fails
+    onError: (error) => {
+      // Show an error toast notification with the error message
+      toast.error(error.message, {
+        id: "update-currency",
+      });
+    },
+  });
 
-  // Callback executed when the mutation fails
-  onError: (error) => {
-    // Show an error toast notification with the error message
-    toast.error(error.message, {
-      id: "update-currency",
-    });
-  },
-});
-
-
-  const selectCurrency = React.useCallback((currency: Currency | null) => {
-    if (!currency) {
-      toast.error("Please select a currency");
-      return;
-    }
-    toast.loading("Updating currency...", {
-      id: "update-currency",
-    });
-    mutation.mutate(currency.value);
-  },[mutation]);
+  const selectCurrency = React.useCallback(
+    (currency: Currency | null) => {
+      if (!currency) {
+        toast.error("Please select a currency");
+        return;
+      }
+      toast.loading("Updating currency...", {
+        id: "update-currency",
+      });
+      mutation.mutate(currency.value);
+    },
+    [mutation]
+  );
 
   if (isDesktop) {
     return (
       <SkeletonWrapper isLoading={userSettings.isFetching}>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full justify-start" disabled={mutation.isPending}>
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              disabled={mutation.isPending}
+            >
               {selectedCurrency ? (
                 <>{selectedCurrency.label}</>
               ) : (
@@ -121,7 +126,11 @@ const mutation = useMutation({
     <SkeletonWrapper isLoading={userSettings.isFetching}>
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
-          <Button variant="outline" className="w-full justify-start" disabled={mutation.isPending}>
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            disabled={mutation.isPending}
+          >
             {selectedCurrency ? (
               <>{selectedCurrency.label}</>
             ) : (

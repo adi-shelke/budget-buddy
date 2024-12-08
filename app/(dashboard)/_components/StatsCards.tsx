@@ -20,6 +20,7 @@ const StatsCards = ({ from, to, userSettings }: Props) => {
       fetch(
         `/api/stats/balance?from=${DateToUTCDate(from)}&to=${DateToUTCDate(to)}`
       ).then((res) => res.json()),
+    refetchOnWindowFocus: false,
   });
 
   const formatter = useMemo(() => {
